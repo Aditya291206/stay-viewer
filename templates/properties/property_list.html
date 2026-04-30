@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Find Your Next Stay in Vallabh Vidyanagar</h1>
+    <p class="subtitle">Discover curated local PGs, Flats, and Private Hostels.</p>
+</div>
+
+<div class="search-container glass-panel">
+    <form method="GET" action="{% url 'properties:property_list' %}" class="search-form">
+        <div class="form-group">
+            <label for="type">Property Type</label>
+            <select name="type" id="type" class="form-control">
+                <option value="">Any</option>
+                <option value="PG" {% if selected_type == 'PG' %}selected{% endif %}>Paying Guest</option>
+                <option value="FLAT" {% if selected_type == 'FLAT' %}selected{% endif %}>Flat / Apartment</option>
+                <option value="HOSTEL" {% if selected_type == 'HOSTEL' %}selected{% endif %}>Private Hostel</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="max_rent">Max Budget (₹)</label>
+            <input type="number" name="max_rent" id="max_rent" class="form-control" placeholder="e.g. 15000" value="{{ selected_rent|default_if_none:'' }}">
+        </div>
+        <div class="form-group">
+            <label for="amenity">Must Have Facility</label>
+            <select name="amenity" id="amenity" class="form-control">
+                <option value="">Any</option>
+                {% for am in amenities %}
+                    <option value="{{ am.name }}" {% if selected_amenity == am.name %}selected{% endif %}>{{ am.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{% url 'properties:property_list' %}" class="btn btn-outline">Clear</a>
+        </div>
+    </form>
+</div>
+
+<div class="property-grid">
+    {% for property in properties %}
+        <div class="property-card">
+            <div class="card-image-container">
+                {% if property.images.all %}
+                    {% with primary_img=property.images.first %}
+                        <img src="{{ primary_img.image.url }}" alt="{{ property.title }}" class="card-image">
+                    {% endwith %}
+                {% else %}
+                    <div class="placeholder-image">
+                        <span>No Image</span>
+                    </div>
+                {% endif %}
+                <span class="badge">{{ property.get_property_type_display }}</span>
+            </div>
+            
+            <div class="card-content">
+                <div class="card-header">
+                    <h2 class="card-title">{{ property.title }}</h2>
+                    <span class="gender-policy {{ property.gender_policy|lower }}">{{ property.get_gender_policy_display }}</span>
+                </div>
+                
+                <p class="card-config">{{ property.configuration }}</p>
+                <p class="card-location">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    {{ property.walking_distance_bvm }}
+                </p>
+                
+                <div class="card-footer">
+                    <div class="rent-info">
+                        <span class="rent-label">Est. Rent</span>
+                        <span class="rent-amount">{{ property.estimated_rent }}</span>
+                    </div>
+                    <a href="{% url 'properties:property_detail' property.pk %}" class="btn btn-primary">View Details</a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            <h3>No properties found.</h3>
+            <p>We are currently updating our directory. Please check back soon.</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

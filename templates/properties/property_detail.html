@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ property.title }} | Stay Viewer{% endblock %}
+
+{% block content %}
+<div class="back-link">
+    <a href="{% url 'properties:property_list' %}">← Back to Listings</a>
+</div>
+
+<div class="property-detail-container">
+    <div class="detail-header">
+        <div class="title-section">
+            <span class="badge">{{ property.get_property_type_display }}</span>
+            <span class="gender-policy {{ property.gender_policy|lower }}">{{ property.get_gender_policy_display }}</span>
+            <h1>{{ property.title }}</h1>
+            <p class="detail-location">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                {{ property.walking_distance_bvm }} | {{ property.address }}
+            </p>
+        </div>
+        <div class="rent-card glass-panel">
+            <h3>Estimated Rent</h3>
+            <div class="amount">{{ property.estimated_rent }}</div>
+            {% if property.broker_fees %}
+                <div class="broker-fees">Broker Fees: {{ property.broker_fees }}</div>
+            {% endif %}
+            <div class="last-updated">Last Updated: {{ property.last_updated|date:"M d, Y" }}</div>
+        </div>
+    </div>
+
+    <div class="detail-grid">
+        <div class="main-column">
+            <!-- Image Gallery -->
+            <div class="gallery">
+                {% if property.images.all %}
+                    <div class="main-image">
+                        <img src="{{ property.images.first.image.url }}" alt="{{ property.title }}">
+                    </div>
+                    {% if property.images.count > 1 %}
+                    <div class="thumbnail-grid">
+                        {% for img in property.images.all|slice:"1:" %}
+                            <img src="{{ img.image.url }}" alt="{{ img.caption }}" class="thumbnail">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="placeholder-image large">No Images Available</div>
+                {% endif %}
+            </div>
+
+            <!-- Description & Config -->
+            <div class="section glass-panel">
+                <h2>Configuration</h2>
+                <p>{{ property.configuration }}</p>
+            </div>
+
+            <!-- Amenities -->
+            <div class="section glass-panel">
+                <h2>Amenities & Facilities</h2>
+                <div class="amenities-grid">
+                    {% for amenity in property.amenities.all %}
+                        <div class="amenity-item">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            {{ amenity.name }}
+                        </div>
+                    {% empty %}
+                        <p>No specific amenities listed.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Location Map -->
+            <div class="section glass-panel">
+                <h2>Location Map</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Interactive map based on property address.</p>
+                <div class="map-container" style="border-radius: var(--radius-md); overflow: hidden; height: 300px; background: #2a2a35;">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0" 
+                        loading="lazy" 
+                        allowfullscreen 
+                        {% if property.map_coordinates %}
+                        src="https://maps.google.com/maps?q={{ property.map_coordinates|urlencode }}&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                        {% else %}
+                        src="https://maps.google.com/maps?q={{ property.address|urlencode }},+Vallabh+Vidyanagar,+Anand,+Gujarat&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                        {% endif %}>
+                    </iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <!-- Contact Box -->
+            <div class="contact-box glass-panel highlight-panel">
+                <h2>Direct Contacts</h2>
+                <p class="contact-warning">Please verify availability and pricing directly.</p>
+                
+                <div class="contact-list">
+                    {% for contact in property.contacts.all %}
+                        <div class="contact-card">
+                            <div class="contact-role">{{ contact.get_role_display }}</div>
+                            <div class="contact-name">{{ contact.name }}</div>
+                            <a href="tel:{{ contact.phone_number }}" class="btn btn-outline">Call {{ contact.phone_number }}</a>
+                        </div>
+                    {% empty %}
+                        <p>No direct contacts provided yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

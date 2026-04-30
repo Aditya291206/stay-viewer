@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stay Viewer | Vallabh Vidyanagar Housing{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=2">
+</head>
+<body class="dark-theme">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'properties:property_list' %}" class="logo">
+                <span class="logo-accent">Stay</span>Viewer
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'properties:property_list' %}?type=PG" class="nav-link">PGs</a>
+                <a href="{% url 'properties:property_list' %}?type=FLAT" class="nav-link">Flats</a>
+                <a href="{% url 'properties:property_list' %}?type=HOSTEL" class="nav-link">Hostels</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>&copy; {% now "Y" %} Stay Viewer | Vallabh Vidyanagar</p>
+            <p class="disclaimer">Disclaimer: This platform does not facilitate real-time bookings or inventory tracking. Please contact landlords directly to confirm availability.</p>
+        </div>
+    </footer>
+</body>
+</html>
