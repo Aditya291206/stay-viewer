@@ -24,5 +24,7 @@ urlpatterns = [
     path('', include('properties.urls')),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files in both development AND production
+# (Django does not serve media automatically when DEBUG=False,
+# so we explicitly add the URL pattern here for Render/Gunicorn)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
